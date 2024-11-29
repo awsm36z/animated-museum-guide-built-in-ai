@@ -1,0 +1,31 @@
+{
+    "manifest_version": 3,
+    "name": "Animated Museum Guide - Built-In AI",
+    "version": "1.0",
+    "description": "An interactive guide for museum visitors using Chrome's built-in AI.",
+    "permissions": [
+      "activeTab",
+      "storage",
+      "microphone"
+    ],
+    "action": {
+      "default_popup": "index.html",
+      "default_icon": {
+        "16": "assets/character_assets/idle.png",
+        "48": "assets/character_assets/idle.png",
+        "128": "assets/character_assets/idle.png"
+      }
+    },
+    "icons": {
+      "16": "assets/character_assets/idle.png",
+      "48": "assets/character_assets/idle.png",
+      "128": "assets/character_assets/idle.png"
+    },
+    "background": {
+      "service_worker": "app.js"
+    },
+    "host_permissions": [
+      "https://*.googleapis.com/"
+    ]
+  }
+  
