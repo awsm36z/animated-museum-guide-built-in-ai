@@ -38,6 +38,7 @@ Follow the instructions below to set up and run the project on your machine.
 ```bash
 git clone https://github.com/yourusername/animated-museum-guide-built-in-ai.git
 cd animated-museum-guide-built-in-ai
+```
 
 Step 2: Backend Setup (Flask Server)
 
