@@ -3,78 +3,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const responseDiv = document.getElementById('response');
     const characterImg = document.getElementById('character');
   
-    // Initialize Web Speech API
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-  
-    const synth = window.speechSynthesis;
-  
-    micButton.addEventListener('click', () => {
-      startListening();
+    micButton.addEventListener('click', async () => {
+      const userQuery = await getVoiceInput();
+      const aiResponse = await processQuery(userQuery);
+      displayResponse(aiResponse);
+      speakResponse(aiResponse);
     });
-  
-    function startListening() {
-      responseDiv.textContent = 'Listening...';
-      recognition.start();
-    }
-  
-    recognition.onresult = (event) => {
-      const userQuery = event.results[0][0].transcript;
-      responseDiv.textContent = `You said: ${userQuery}`;
-      processQuery(userQuery);
-    };
-  
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      responseDiv.textContent = "Sorry, I couldn't understand that. Please try again.";
-    };
-  
-    recognition.onend = () => {
-      responseDiv.textContent = 'Processing your request...';
-    };
   
     async function processQuery(query) {
       try {
-        if (!('ai' in chrome && 'prompt' in chrome.ai)) {
-          throw new Error('Prompt API is not available in this browser.');
-        }
-  
-        const session = await chrome.ai.prompt.createSession();
-  
-        const result = await session.sendPrompt({
-          prompt: `You are a friendly museum guide. Answer the following question: ${query}`,
-          temperature: 0.7,
-          maxTokens: 150,
+        const response = await fetch("http://localhost:5000/query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query }),
         });
-  
-        const aiResponse = result.choices[0].text.trim();
-        displayResponse(aiResponse);
-        speakResponse(aiResponse);
+        const data = await response.json();
+        return data.answer;
       } catch (error) {
-        console.error('Error:', error);
-        const errorMessage = "I'm sorry, I couldn't process your request.";
-        displayResponse(errorMessage);
-        speakResponse(errorMessage);
+        console.error("Error processing query:", error);
+        return "Sorry, I couldn't process your request.";
       }
     }
   
     function displayResponse(response) {
       responseDiv.textContent = response;
-      characterImg.src = 'assets/character_assets/speaking.png';
+      characterImg.src = "assets/character_assets/speaking.png";
       setTimeout(() => {
-        characterImg.src = 'assets/character_assets/idle.png';
+        characterImg.src = "assets/character_assets/idle.png";
       }, 2000);
     }
   
     function speakResponse(response) {
       const utterance = new SpeechSynthesisUtterance(response);
-      utterance.lang = 'en-US';
-      utterance.onend = () => {
-        characterImg.src = 'assets/character_assets/idle.png';
-      };
-      characterImg.src = 'assets/character_assets/speaking.png';
-      synth.speak(utterance);
+      speechSynthesis.speak(utterance);
+    }
+  
+    async function getVoiceInput() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+      recognition.start();
+  
+      return new Promise((resolve) => {
+        recognition.onresult = (event) => {
+          const query = event.results[0][0].transcript;
+          resolve(query);
+        };
+      });
     }
   });
   
