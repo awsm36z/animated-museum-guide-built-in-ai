@@ -123,8 +123,8 @@ Author
 
 Yassine El Yacoubi
 
-    Website: Musa.im
-    Blog: Medium Blog
+    Website: https://musaim.ai
+    Blog: https://bit.ly/yassine-blogs
 
 License
 
